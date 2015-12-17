@@ -40,7 +40,7 @@ end
 def player_turn(board)
   square = ''
   loop do
-    puts ("Choose a square #{joinor(empty_squares(board))}")
+    puts "Choose a square #{joinor(empty_squares(board))}"
     square = gets.chomp.to_i
     break if empty_squares(board).include?(square)
     puts "Sorry this is not a valid square."
@@ -48,8 +48,8 @@ def player_turn(board)
   board[square] = PLAYER_MARKER
 end
 
-def computer_defend_square(line, board)
-  if board.values_at(*line).count(PLAYER_MARKER) == 2
+def computer_select_square(line, board, marker_type)
+  if board.values_at(*line).count(marker_type) == 2
     board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   else
     nil
@@ -60,12 +60,19 @@ def computer_turn(board)
   square = nil
 
   WINNING_LINES.each do |line|
-    square = computer_defend_square(line, board)
+    square = computer_select_square(line, board, PLAYER_MARKER)
     break if square
   end
 
-  if square == nil
-    square = board[empty_squares(board).sample]
+  if !square
+    WINNING_LINES.each do |line|
+      square = computer_select_square(line, board, COMPUTER_MARKER)
+      break if square
+    end
+  end
+
+  if !square
+    square = empty_squares(board).sample
   end
 
   board[square] = COMPUTER_MARKER
