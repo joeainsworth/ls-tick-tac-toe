@@ -37,7 +37,7 @@ def empty_squares(board)
   board.keys.select { |num| board[num] == INITIAL_MARKER }
 end
 
-def player_turn(board)
+def player_turn!(board)
   square = ''
   loop do
     puts "Choose a square #{joinor(empty_squares(board))}"
@@ -56,7 +56,7 @@ def computer_select_square(line, board, marker_type)
   end
 end
 
-def computer_turn(board)
+def computer_turn!(board)
   square = nil
 
   WINNING_LINES.each do |line|
@@ -123,22 +123,28 @@ def joinor(array, delimeter=', ' , word='or')
   return string
 end
 
+def place_piece!(board, current_player)
+  current_player == 'player' ? player_turn!(board) : computer_turn!(board)
+end
+
+def alternate_player(player)
+  player == 'player' ? 'computer' : 'player'
+end
+
 board = initialize_board
 player_score = 0
 computer_score = 0
 
 # Keeping playing until user chooses to quit
 loop do
-
   # Play game until player or computer wins 5 rounds
   loop do
 
-    # Take turns until board is full or somebody wins rounds
+    current_player ||= 'player'
     loop do
       display_board(board)
-      player_turn(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_turn(board)
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
       break if someone_won?(board) || board_full?(board)
     end
 
